@@ -19,3 +19,9 @@ Here are the recommended steps to setup a Python environment that can run this c
 ## Explanation of the code
 
 (YouTube Video)
+
+
+
+# FAQs
+
+(no questions yet)
