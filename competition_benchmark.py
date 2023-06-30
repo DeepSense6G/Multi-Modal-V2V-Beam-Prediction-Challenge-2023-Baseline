@@ -198,32 +198,35 @@ def compute_acc(all_beams, only_best_beam, top_k=[1, 3, 5]):
 
 
 # %% Read CSV and Load dataset
+scen_idx = 37
 csv_train = 'D:/BENCHMARKS/deepsense_challenge2023_trainset.csv'
-csv_dict_path = 'D:/BENCHMARKS/scenario36/scenario36.p'
+csv_dict_path = f'D:/BENCHMARKS/scenario{scen_idx}/scenario{scen_idx}.p'
 
 with open(csv_dict_path, 'rb') as fp:
     csv_dict = pickle.load(fp)
 
+df_train = pd.read_csv(csv_train)
+
 #%% Example of loading and displaying RGB180 images
 
-df_train = pd.read_csv(csv_train)
-sample_idx = 0
+if False: 
+    sample_idx = 0
+    
+    csv_train_folder = '/'.join(csv_train.split('/')[:-1])
+    scen_folder = 'scenario' + str(df_train['scenario'][sample_idx])
+    img1_path = csv_train_folder + '/' + scen_folder + '/' + csv_dict['unit1_rgb5'][sample_idx]
+    img2_path = csv_train_folder + '/' + scen_folder + '/' + csv_dict['unit1_rgb6'][sample_idx]
+    img1 = plt.imread(img1_path)
+    img2 = plt.imread(img2_path)
+    fig, axs = plt.subplots(2,1, figsize=(16,9), dpi=200)
+    axs[0].imshow(img1) # front
+    axs[1].imshow(img2) # back
 
-csv_train_folder = '/'.join(csv_train.split('/')[:-1])
-scen_folder = 'scenario' + str(df_train['scenario'][sample_idx])
-img1_path = csv_train_folder + '/' + scen_folder + '/' + csv_dict['unit1_rgb5'][sample_idx]
-img2_path = csv_train_folder + '/' + scen_folder + '/' + csv_dict['unit1_rgb6'][sample_idx]
-img1 = plt.imread(img1_path)
-img2 = plt.imread(img2_path)
-fig, axs = plt.subplots(2,1, figsize=(16,9), dpi=200)
-axs[0].imshow(img1) # front
-axs[1].imshow(img2) # back
-
-# %% (Fast Loading) Load Training positions and ground truth positions (for scenario 36 only)
+# %% (Fast Loading) Load Training positions and ground truth positions
 
 # Load all positions
-samples_of_scen36 = np.where(df_train['scenario'] == 36)[0]
-n_samples = len(samples_of_scen36)
+samples_of_scen = np.where(df_train['scenario'] == scen_idx)[0]
+n_samples = len(samples_of_scen)
 
 loaded_positions = set()
 train_positions = np.zeros((n_samples, X_SIZE, N_GPS, N_GPS_COORD))
@@ -232,20 +235,20 @@ y_pos1 = np.zeros((n_samples, N_GPS_COORD))
 y_pos2 = np.zeros((n_samples, N_GPS_COORD))
 y_pwrs = np.zeros((n_samples, N_ARR, N_BEAMS))
 for sample_idx in tqdm(range(n_samples), desc='Loading data'):
-    train_sample = samples_of_scen36[sample_idx]
+    train_sample = samples_of_scen[sample_idx]
     for x_idx in range(X_SIZE):
         abs_idx_relative_index = (csv_dict['abs_index'] == df_train[f'x{x_idx+1}_abs_index'][train_sample])
-        train_positions[train_sample, x_idx, 0, :] = csv_dict['unit1_gps1'][abs_idx_relative_index]
-        train_positions[train_sample, x_idx, 1,:] = csv_dict['unit2_gps1'][abs_idx_relative_index]
+        train_positions[sample_idx, x_idx, 0, :] = csv_dict['unit1_gps1'][abs_idx_relative_index]
+        train_positions[sample_idx, x_idx, 1,:] = csv_dict['unit2_gps1'][abs_idx_relative_index]
 
     # Positions of the output to compare with our position estimation approach
     y_idx = (csv_dict['abs_index'] == df_train['y1_abs_index'][train_sample])
-    y_pos1[train_sample] = csv_dict['unit1_gps1'][y_idx]
-    y_pos2[train_sample] = csv_dict['unit2_gps1'][y_idx]
+    y_pos1[sample_idx] = csv_dict['unit1_gps1'][y_idx]
+    y_pos2[sample_idx] = csv_dict['unit2_gps1'][y_idx]
     for arr_idx in range(N_ARR):
-        y_pwrs[train_sample, arr_idx] = csv_dict[f'unit1_pwr{arr_idx+1}'][y_idx]
+        y_pwrs[sample_idx, arr_idx] = csv_dict[f'unit1_pwr{arr_idx+1}'][y_idx]
 
-y_true_beams = df_train['y1_unit1_overall-beam'].values[samples_of_scen36]
+y_true_beams = df_train['y1_unit1_overall-beam'].values[samples_of_scen]
 
 # array 1 (0-63), array 2 (64-127), array 3 (128-191), array 4 (192-255)
 y_pwrs_reshaped = y_pwrs.reshape((n_samples, -1))
@@ -253,18 +256,19 @@ all_true_beams = np.flip(np.argsort(y_pwrs_reshaped, axis=1), axis=1)
 
 # %% (Slow loading) Example of data loading for the testset
 
-csv_test = csv_train
-df_test = pd.read_csv(csv_test)
-n_samples = 1000 # example size of testset
-folder = '/'.join(csv_test.split('/')[:-1])
-input_pos = np.zeros((n_samples, X_SIZE, N_GPS, N_GPS_COORD))
-
-for sample_idx in tqdm(range(n_samples), desc='Loading data'):
-    for x_idx in range(X_SIZE):
-        input_pos[sample_idx, x_idx, 0, :] = \
-            np.loadtxt(folder + '/' + df_test[f'x{x_idx+1}_unit1_gps1'][sample_idx])
-        input_pos[sample_idx, x_idx, 1, :] = \
-            np.loadtxt(folder + '/' + df_test[f'x{x_idx+1}_unit2_gps1'][sample_idx])
+if False:
+    csv_test = csv_train
+    df_test = pd.read_csv(csv_test)
+    n_samples = 1000 # example size of testset
+    folder = '/'.join(csv_test.split('/')[:-1])
+    input_pos = np.zeros((n_samples, X_SIZE, N_GPS, N_GPS_COORD))
+    
+    for sample_idx in tqdm(range(n_samples), desc='Loading data'):
+        for x_idx in range(X_SIZE):
+            input_pos[sample_idx, x_idx, 0, :] = \
+                np.loadtxt(folder + '/' + df_test[f'x{x_idx+1}_unit1_gps1'][sample_idx])
+            input_pos[sample_idx, x_idx, 1, :] = \
+                np.loadtxt(folder + '/' + df_test[f'x{x_idx+1}_unit2_gps1'][sample_idx])
 
 # %% Step 1: Estimate positions in the new timestamp (linear interpolation)
 delta_input = 0.2  # time difference between input samples [s]
@@ -276,18 +280,19 @@ gps2_est_pos = estimate_positions(train_positions[:, :, 1, :], delta_input, delt
 # Compare estimated with real
 if True:
     plt.figure(figsize=(10, 6), dpi=200)
-    n = np.arange(300)
+    n = np.arange(1500)
     plt.plot(y_pos1[n, 0], -y_pos1[n, 1], alpha=.5,
              label='True positions', marker='o', markersize=1)
     plt.plot(gps1_est_pos[n, 0], -gps1_est_pos[n, 1], alpha=.5, 
              label='Estimated positions', c='r', marker='o', markersize=1)
+    plt.annotate('start', xy=(y_pos1[0,0], -y_pos1[0,1]))
+    plt.annotate('end', xy=(y_pos1[n[-1],0], -y_pos1[n[-1],1]))
     plt.title('Position Estimation')
     plt.xlabel('Latitude')
     plt.ylabel('Longitude')
     plt.legend()
     plt.show()
-    # annotate start and end points
-
+    
 # %% Step 2: With the estimated positions, estimate orientation
 
 # 2.1 - Determine heading of vehicles using last available location and the new estimated location
@@ -320,7 +325,7 @@ if True:
 # %% Step 3: From orientation, estimate beam (assume uniform beam distribution)
 
 beam_pred_all = predict_beam_uniformly_from_aoa(aoa_estimation)
-best_beam_pred = beam_pred_all[:, 0]
+best_beam_pred = np.copy(beam_pred_all[:, 0]) # keep decoupled
 
 # After analysis, we were often 1 beam short. 
 pred_diff = np.array([circular_distance(a, b, sign=True)
@@ -329,11 +334,11 @@ pred_diff = np.array([circular_distance(a, b, sign=True)
 # The box sometimes is slightly rotated around it's Z axis, so we can shift our
 # Beam predictions a constant offset to get better performance. Admit offsets up to 2.
 # Note: this adjustment is only for the training phase
-shift = -round(np.mean(pred_diff[abs(pred_diff) < 2]))
+shift = -round(np.mean(pred_diff[abs(pred_diff) < 5]))
 print(f'estimated_shift = {shift}')
 beam_pred_all += shift
 best_beam_pred += shift
-
+######################################################
 # Check if the prediction is good
 if True:
     x = np.arange(len(aoa_estimation))
@@ -357,7 +362,7 @@ df_out.to_csv('SUBMISSION-EXAMPLE_prediction.csv', index=False)
 # and you submit the best_beam_pred in a csv
 
 pred_diff_abs = np.array([circular_distance(a, b)
-                             for a, b in zip(best_beam_pred, all_true_beams[:,0])])
+                          for a, b in zip(best_beam_pred, all_true_beams[:,0])])
 total_score = np.mean(pred_diff_abs) # lower is better!
 
 n_beams_under_3_of_best = len(np.where(pred_diff_abs < 3)[0])
@@ -384,8 +389,8 @@ print(f'Top-k = {top_k}')
 
 # "Probability of the ground truth best beam being in the set of most likely k predicted beams"
 top_k = compute_acc(beam_pred_all, all_true_beams[:, 0], top_k=[1, 3, 5])
-print(f'(usual) Top-k = {top_k}')
+print(f'(not used) Top-k = {top_k}')
 
-# To make it practical for submissions, we implement way 1 and only require the
-# best predicted beam. 
+# To make it practical for submissions, we implement only the first way so we 
+# only require the best predicted beam. 
 
