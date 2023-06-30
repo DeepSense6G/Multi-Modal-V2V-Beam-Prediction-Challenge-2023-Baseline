@@ -103,10 +103,8 @@ def estimate_positions(input_positions, delta_input, delta_output):
     for sample_idx in tqdm(range(n_samples), desc='Estimating input positions'):
         input_pos = input_positions[sample_idx]
 
-        f_lat = scipy.interpolate.interp1d(
-            x, input_pos[:, 0], fill_value='extrapolate')
-        f_lon = scipy.interpolate.interp1d(
-            x, input_pos[:, 1], fill_value='extrapolate')
+        f_lat = scipy.interpolate.interp1d(x, input_pos[:, 0], fill_value='extrapolate')
+        f_lon = scipy.interpolate.interp1d(x, input_pos[:, 1], fill_value='extrapolate')
 
         out_pos[sample_idx, 0] = f_lat(x[-1] + delta_output)
         out_pos[sample_idx, 1] = f_lon(x[-1] + delta_output)
@@ -198,7 +196,7 @@ def compute_acc(all_beams, only_best_beam, top_k=[1, 3, 5]):
 
 
 # %% Read CSV and Load dataset
-scen_idx = 37
+scen_idx = 36
 csv_train = 'D:/BENCHMARKS/deepsense_challenge2023_trainset.csv'
 csv_dict_path = f'D:/BENCHMARKS/scenario{scen_idx}/scenario{scen_idx}.p'
 
@@ -338,7 +336,7 @@ shift = -round(np.mean(pred_diff[abs(pred_diff) < 5]))
 print(f'estimated_shift = {shift}')
 beam_pred_all += shift
 best_beam_pred += shift
-######################################################
+
 # Check if the prediction is good
 if True:
     x = np.arange(len(aoa_estimation))
