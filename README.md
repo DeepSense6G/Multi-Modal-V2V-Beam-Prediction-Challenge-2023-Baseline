@@ -2,11 +2,16 @@
 Baseline for the DeepSense6G Beam Prediction Challenge 2023 based on V2V datasets. 
 
 ## Requirements to run the code
-Basic Python installation + NumPy, SciPy, Pandas, tqdm
 
-All packages are available in pip or the default conda repositories. 
-The environment packages are exported in ```deepsense-env.txt```, but most of them are not 
-necessary. 
+The Python environment used is exported in ```deepsense-env.txt```, but most of them are not 
+necessary. All that is necessary to run the scripts is a basic Python installation and the
+modules: 
+- NumPy
+- SciPy
+- Pandas
+- tqdm
+- Pickle
+- Matplotlib
 
 Here are the recommended steps to setup a Python environment that can run this code:
 
@@ -14,13 +19,11 @@ Here are the recommended steps to setup a Python environment that can run this c
 2. Open Miniforge Prompt and create a new environment
 ```mamba create -n deepsense-challenge```
 3. Install the required packages
-```mamba install numpy scipy pandas tqdm```
+```mamba install numpy scipy pandas tqdm pickle matplotlib```
 
 ## Explanation of the code
 
 (YouTube Video)
-
-
 
 # FAQs
 
