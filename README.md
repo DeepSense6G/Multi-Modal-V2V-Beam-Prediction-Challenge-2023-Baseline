@@ -1,5 +1,5 @@
 # Multi-Modal V2V Beam Prediction Challenge 2023 Baseline & Starter Scripts
-Baseline for the DeepSense6G Beam Prediction Challenge 2023 based on V2V datasets. 
+Baseline for the [DeepSense6G Beam Prediction Challenge 2023](https://deepsense6g.net/beam_prediction_challenge_2023/) based on V2V datasets. 
 
 ## Requirements to run the code
 
