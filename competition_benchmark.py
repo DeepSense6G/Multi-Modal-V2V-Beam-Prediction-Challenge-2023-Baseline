@@ -48,7 +48,7 @@ def norm_2pi(x):
     return x_normed
 
 
-def compute_ori_from_pos_delta(lat_deltas, lon_deltas, thres_lat=0, thres_lon=0):
+def compute_ori_from_pos_delta(lat_deltas, lon_deltas):
     """
     Returns orientation in [-pi, pi]
     # 0 = East
@@ -68,12 +68,12 @@ def compute_ori_from_pos_delta(lat_deltas, lon_deltas, thres_lat=0, thres_lon=0)
 
     for i in range(n_samples):
 
-        delta_lon = 0 if abs(lat_deltas[i-1]) < thres_lon else lat_deltas[i-1]
-        delta_lat = 0 if abs(lon_deltas[i-1]) < thres_lat else lon_deltas[i-1]
+        delta_lat = lat_deltas[i-1]
+        delta_lon = lon_deltas[i-1]
 
         if delta_lon == 0:
             if delta_lat == 0:
-                pose[i] = 0 # pose[i-1]
+                pose[i] = 0
                 continue
             elif delta_lat > 0:
                 slope = np.pi / 2
@@ -196,7 +196,7 @@ def compute_acc(all_beams, only_best_beam, top_k=[1, 3, 5]):
 
 
 # %% Read CSV and Load dataset
-scen_idx = 36
+scen_idx = 39
 csv_train = 'D:/BENCHMARKS/deepsense_challenge2023_trainset.csv'
 csv_dict_path = f'D:/BENCHMARKS/scenario{scen_idx}/scenario{scen_idx}.p'
 
@@ -305,7 +305,7 @@ lon_deltas = gps1_est_pos[:, 1] - gps2_est_pos[:, 1]
 ori_rel = compute_ori_from_pos_delta(lat_deltas, lon_deltas)
 
 # referenced to beam 0 of front array
-aoa_estimation = norm_2pi(ori_rel - heading + np.pi/4)
+aoa_estimation = norm_2pi(-1*(ori_rel - heading - np.pi/4))
 
 # check if they correlate enough for an accurate prediction
 if True:
