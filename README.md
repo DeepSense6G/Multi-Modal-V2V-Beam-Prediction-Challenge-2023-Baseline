@@ -24,18 +24,19 @@ Here are the recommended steps to setup a Python environment that can run this c
 ## Problem and Code Explanation
 
 [![PROBLEM & CODE EXPLANATION](code_explanation_video_thumbnail.png)](https://youtu.be/1D3PAe5uKVM)
+(*click the image for watching the video*)
 
 Outline of the video:
-1- Problem & provided data: 3 pieces of information in 4 files
-2- Necessary data and folder structure:
+1. Problem & provided data: 3 pieces of information in 4 files
+2. Necessary data and folder structure:
 	- necessary data for competition -> GPS, optionally RGB, optionally CSVs/pre-loaded dicts
 	- necessary data for benchmark   -> GPS and PWR and pre-loaded dicts
-3- Pyhon environment setup
-4- Two different ways of loading the data: fast for training and slow for testing 
-5- Loading & Display images
-6- Baseline approach and code
-7- Output results in submission format
-8- Evaluation metric/score
+3. Pyhon environment setup
+4. Two different ways of loading the data: fast for training and slow for testing 
+5. Loading & Display images
+6. Baseline approach and code
+7. Output results in submission format
+8. Evaluation metric/score
 
 # FAQs
 
