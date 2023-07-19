@@ -195,8 +195,17 @@ def compute_acc(all_beams, only_best_beam, top_k=[1, 3, 5]):
     return np.round(total_hits / len(only_best_beam), 4)
 
 
+def APL(true_best_pwr, est_best_pwr):
+    """
+    Average Power Loss: average of the power wasted by using the predicted beam
+    instead of the ground truth optimum beam.
+    """
+    
+    return np.mean(10 * np.log10(est_best_pwr / true_best_pwr))
+
+
 # %% Read CSV and Load dataset
-scen_idx = 39
+scen_idx = 36
 csv_train = 'D:/BENCHMARKS/deepsense_challenge2023_trainset.csv'
 csv_dict_path = f'D:/BENCHMARKS/scenario{scen_idx}/scenario{scen_idx}.p'
 
@@ -337,6 +346,12 @@ print(f'estimated_shift = {shift}')
 beam_pred_all += shift
 best_beam_pred += shift
 
+# make sure the output is within 0-255
+beam_pred_all[beam_pred_all>255] -= 255
+beam_pred_all[beam_pred_all<0] += 255
+best_beam_pred[best_beam_pred>255] -= 255
+best_beam_pred[best_beam_pred<0] += 255
+
 # Check if the prediction is good
 if True:
     x = np.arange(len(aoa_estimation))
@@ -361,34 +376,31 @@ df_out.to_csv('SUBMISSION-EXAMPLE_prediction.csv', index=False)
 
 pred_diff_abs = np.array([circular_distance(a, b)
                           for a, b in zip(best_beam_pred, all_true_beams[:,0])])
-total_score = np.mean(pred_diff_abs) # lower is better!
+average_beam_index_diff = np.mean(pred_diff_abs) # lower is better!
 
-n_beams_under_3_of_best = len(np.where(pred_diff_abs < 3)[0])
-print('No. beams under distance of 3 of the best = '
-      f'{n_beams_under_3_of_best} ({n_beams_under_3_of_best / n_samples * 100:.2f} %)')
+print(f'Average Beam Index Distance = {average_beam_index_diff:.2f}')
 
-n_beams_under_5_of_best = len(np.where(pred_diff_abs < 5)[0])
-print('No. beams under distance of 5 of the best = '
-      f'{n_beams_under_5_of_best} ({n_beams_under_5_of_best / n_samples * 100:.2f} %)')
-
-print(f'Score (average distance to optimal beam) = {total_score:.2f}')
-
-
-# Visualize score
+# Visualize beam diff
 if True:
     plt.figure(figsize=(10, 6), dpi=200)
     plt.scatter(np.arange(len(pred_diff_abs)), pred_diff_abs, s=2)
-    plt.hlines(y=total_score, xmin=0, xmax=len(pred_diff_abs), color='r',alpha=.5)
+    plt.hlines(y=average_beam_index_diff, xmin=0, xmax=len(pred_diff_abs), color='r',alpha=.5)
 
 # "Probability of the prediction of the best beam being in the set of best k ground truth beams"
 top_k = compute_acc(all_true_beams, best_beam_pred, top_k=[1, 3, 5])
 print(f'Top-k = {top_k}')
 
-
 # "Probability of the ground truth best beam being in the set of most likely k predicted beams"
 top_k = compute_acc(beam_pred_all, all_true_beams[:, 0], top_k=[1, 3, 5])
 print(f'(not used) Top-k = {top_k}')
 
-# To make it practical for submissions, we implement only the first way so we 
+# For practical submissions, we implement only the first way so we 
 # only require the best predicted beam. 
+
+# And finally, the score -> APL (Average Power Loss)
+est_best_pwr = y_pwrs_reshaped[np.arange(n_samples), best_beam_pred]
+true_best_pwr = y_pwrs_reshaped[np.arange(n_samples), all_true_beams[:, 0]]
+apl = APL(true_best_pwr, est_best_pwr)
+print(f'Average Power Loss = {apl:.2f} dB')
+
 
