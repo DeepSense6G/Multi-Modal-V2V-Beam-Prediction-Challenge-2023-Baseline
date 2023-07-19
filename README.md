@@ -38,6 +38,9 @@ Outline of the video:
 7. Output results in submission format
 8. Evaluation metric/score
 
+**Important changes**:
+- Evaluation metric/score changed! Instead of the average beam distance, now it is the average power loss. The current code has the right metric, but the video will still show the old metric. For more information about this metric, refer to the competition page: [Beam Prediction Challenge 2023](https://deepsense6g.net/beam_prediction_challenge_2023/)
+
 # FAQs
 
 (no questions yet)
