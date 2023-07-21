@@ -23,7 +23,9 @@ N_GPS = 2       # 2 GPSs (unit1 and unit2)
 N_GPS_COORD = 2 # 2 GPS coords (latitude & longitude)
 N_ARR = 4       # 4 arrays
 N_BEAMS = 64    # 64 beams per array
-
+IDX_COL1 = 'unique_index' # index col in the training CSV
+IDX_COL2 = 'abs_index'    # index col in the CSVs of the V2V dataset 
+                          # this indices are the same, just dif names
 
 def norm_2pi(x):
     # -pi to pi
@@ -244,12 +246,12 @@ y_pwrs = np.zeros((n_samples, N_ARR, N_BEAMS))
 for sample_idx in tqdm(range(n_samples), desc='Loading data'):
     train_sample = samples_of_scen[sample_idx]
     for x_idx in range(X_SIZE):
-        abs_idx_relative_index = (csv_dict['abs_index'] == df_train[f'x{x_idx+1}_abs_index'][train_sample])
+        abs_idx_relative_index = (csv_dict[IDX_COL2] == df_train[f'x{x_idx+1}_'+IDX_COL1][train_sample])
         train_positions[sample_idx, x_idx, 0, :] = csv_dict['unit1_gps1'][abs_idx_relative_index]
         train_positions[sample_idx, x_idx, 1,:] = csv_dict['unit2_gps1'][abs_idx_relative_index]
 
     # Positions of the output to compare with our position estimation approach
-    y_idx = (csv_dict['abs_index'] == df_train['y1_abs_index'][train_sample])
+    y_idx = (csv_dict[IDX_COL2] == df_train['y1_'+IDX_COL1][train_sample])
     y_pos1[sample_idx] = csv_dict['unit1_gps1'][y_idx]
     y_pos2[sample_idx] = csv_dict['unit2_gps1'][y_idx]
     for arr_idx in range(N_ARR):
