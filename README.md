@@ -24,7 +24,7 @@ Here are the recommended steps to setup a Python environment that can run this c
 ## Problem and Code Explanation
 
 [![PROBLEM & CODE EXPLANATION](code_explanation_video_thumbnail.png)](https://youtu.be/1D3PAe5uKVM)
-(*click the image for watching the video*)
+(*click the image to watch the video*)
 
 Outline of the video:
 1. Problem & provided data: 3 pieces of information in 4 files
