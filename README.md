@@ -39,8 +39,29 @@ Outline of the video:
 8. Evaluation metric/score
 
 **Important changes**:
-- Evaluation metric/score changed! Instead of the average beam distance, now it is the average power loss. The current code has the right metric, but the video will still show the old metric. For more information about this metric, refer to the competition page: [Beam Prediction Challenge 2023](https://deepsense6g.net/beam_prediction_challenge_2023/)
+- Evaluation metric/score changed! Instead of the average beam distance, it is the average power loss. The current code has the right metric, but the video will still show the old metric. For more information about this metric, refer to the competition page: [Beam Prediction Challenge 2023](https://deepsense6g.net/beam_prediction_challenge_2023/)
 
 # FAQs
 
-(no questions yet)
+## Problems unzipping data
+
+1. Make sure you read the section “How to Access Scenario Data?” in DeepSense Scenarios 36-39 and watch the video
+2. For MacOS/Linux: install 7zip (https://www.7-zip.org/download.html) and run `7z x my_zip.zip.001`
+    (For MacOS, it can also be installed with `brew install p7zip`)
+    
+## Problems downloading data? “Link expired”?
+
+1. Make sure you are trying to download the files individually, not all the folders at once
+2. Make sure you read the section “How to Access Scenario Data?” in DeepSense Scenarios 36-39 and watch the video
+3. Try to get a better internet connection by moving locations (e.g., to the university) or by connecting an Ethernet cable (you can test your internet speed in speedtest.net - speeds under 10 Mbps often struggle to complete the download)
+4. If you get a “link expired” error, then try to download the data via an alternative shared folder from Dropbox: 
+    https://www.dropbox.com/sh/5zpmzzbkp93w5zl/AADbaPG1aSfQEBgpr8xy6BnTa?dl=1
+    Note: *when using this link*, the download size is limited depending on your account. Basic and trial accounts can only download 20GB per day. Premium accounts can do 400GB a day. 
+5. If none of the above steps work, contact us, and we’ll figure something out.
+
+## What is the scenario36.p file? 
+
+It’s a pickle file. It contains the same content as the CSV file, but the powers are already pre-loaded, making it faster to use if you use Python. The equivalent version for Matlab is scenario36.mat. 
+
+Take a look at the video at the top of this GitHub page for more information. 
+
